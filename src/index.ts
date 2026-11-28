@@ -1,14 +1,16 @@
 import { fetchJobs } from "./api";
+import { formatJobList } from "./format";
 
+const LIMIT = 5
 
 async function main() {
-    const data = await fetchJobs({ search: "node.js", limit: 10 });
 
-    console.log(`Ofertas devueltas: ${data["job-count"]}`);
+    const data = await fetchJobs({ search: "node.js" });
+    const jobs = data.jobs.slice(0, LIMIT);
 
-    for (const job of data.jobs) {
-        console.log(`- ${job.title} (${job.company_name})`);
-    }
+    console.log(formatJobList(jobs));
+
+    return
 }
 
 main().catch((err) => {

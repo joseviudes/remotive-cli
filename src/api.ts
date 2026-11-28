@@ -16,15 +16,19 @@ export async function fetchJobs(options: FetchJobOptions = {}): Promise<JobRespo
         url.searchParams.set("search", options.search);
     }
 
-    if (options.limit) {
-        url.searchParams.set("limit", options.limit.toString());
-    }
-
     const response = await fetch(url);
 
     if (!response.ok) {
         throw new Error(`Remotive responded ${response.status} ${response.statusText}`);
     }
 
-    return response.json() as Promise<JobResponse>;
+    const data = (await response.json()) as JobResponse;
+
+    // La API de Remotive ignora el parámetro "limit", así que se aplica aquí.
+    if (options.limit) {
+        data.jobs = data.jobs.slice(0, options.limit);
+        data["job-count"] = data.jobs.length;
+    }
+
+    return data;
 }
